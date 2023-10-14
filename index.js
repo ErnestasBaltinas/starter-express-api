@@ -138,10 +138,11 @@ app.get('/test2', async (req, res) => {
 	}
 });
 
-app.get('/test3', async (req, res) => {
+app.get('/test3/:size', async (req, res) => {
 
+	const size = Number(req.params.size);
 	const promisesUrls = [...IPR_URLS];
-	const chunkSize = 10; // Set the desired chunk size
+	const chunkSize = size || 30; // Set the desired chunk size
 	const chunks = [];
 
 	for (let i = 0; i < promisesUrls.length; i += chunkSize) {
