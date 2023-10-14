@@ -176,7 +176,9 @@ app.get('/test3/:count/:size', async (req, res) => {
 	}
 
 	console.log({
-		length: results.length
+		length: results.length,
+		rejected: results.filter(r => r.status === 'rejected').length,
+		fulfilled: results.filter(r => r.status !== 'rejected').length
 	})
 
 	res.json(results.filter(r => r.status === 'rejected')); 
