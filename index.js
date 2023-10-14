@@ -112,7 +112,7 @@ const IPR_URLS =  [
 const BASE_URL = 'https://ipr.esveikata.lt'
 const axi = axios.create({
 	baseURL: BASE_URL,
-	timeout: 10000, // Adjust the timeout as needed
+	timeout: 30000, // Adjust the timeout as needed
 });
 
 app.all('/', (req, res) => {
