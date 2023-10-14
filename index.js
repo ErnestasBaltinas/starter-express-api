@@ -37,7 +37,7 @@ app.get('/test2', async (req, res) => {
 
 app.get('/test3', async (req, res) => {
 
-	const promisesUrls = urls.splice(0, 150);
+	const promisesUrls = [...urls.splice(0, 150)];
 	const chunkSize = 10; // Set the desired chunk size
 	const chunks = [];
 
