@@ -3,6 +3,7 @@ const fetch = require('node-fetch');
 const urls = require('./data.js')
 const app = express()
 const port = process.env.PORT || 3005;
+const axios = require('axios');
 
 const IPR_URLS =  [
     'https://ipr.esveikata.lt/api/searches/appointments/times?municipalityId=7&professionCode=221257&healthcareServiceId=9&organizationId=1000098867',
@@ -107,6 +108,13 @@ const IPR_URLS =  [
        'https://ipr.esveikata.lt/api/searches/appointments/times?municipalityId=7&healthcareServiceId=210&organizationId=1000098867&specialistId=1000118730&leftBound=1697312057000&rightBound=1701295200000'
        ]
 
+	   
+const BASE_URL = 'https://ipr.esveikata.lt'
+const axi = axios.create({
+	baseURL: BASE_URL,
+	timeout: 10000, // Adjust the timeout as needed
+});
+
 app.all('/', (req, res) => {
     console.log("Just got a request!")
     res.send('Yo!')
@@ -151,7 +159,7 @@ app.get('/test3/:count/:size', async (req, res) => {
 	}
 
 	let results = [];
-	console.log(`[chunks] ${chunks.length} for [URLS]: ${promisesUrls.length}`);
+	console.log(`[FETCH-chunks] ${chunks.length} for [URLS]: ${promisesUrls.length}`);
 	let i = 0;
 	for (const chunk of chunks) {
 		const data = await Promise.allSettled(
@@ -167,6 +175,55 @@ app.get('/test3/:count/:size', async (req, res) => {
 				} catch (error) {
 					console.log({error});
 					throw `Error fetching data from ${url}: ${error.message}`;
+				}
+			})
+		);
+		i += 1;
+		console.log(`[chunk-done] ${i}/${chunks.length}`);
+		results = [...results, ...data];
+	}
+
+	console.log({
+		length: results.length,
+		rejected: results.filter(r => r.status === 'rejected').length,
+		fulfilled: results.filter(r => r.status !== 'rejected').length
+	})
+
+	res.json(results.filter(r => r.status === 'rejected')); 
+
+
+});
+
+app.get('/test4/:count/:size', async (req, res) => {
+
+	const count = Number(req.params.count);
+	const size = Number(req.params.size);
+	let promisesUrls = [...IPR_URLS].splice(0, count);
+	const chunkSize = size || 30; // Set the desired chunk size
+	const chunks = [];
+
+	for (let i = 0; i < promisesUrls.length; i += chunkSize) {
+		chunks.push(promisesUrls.slice(i, i + chunkSize));
+	}
+
+	let results = [];
+	console.log(`[AXIOS-chunks] ${chunks.length} for [URLS]: ${promisesUrls.length}`);
+	let i = 0;
+	for (const chunk of chunks) {
+		const data = await Promise.allSettled(
+			chunk.map(async (url) => {
+				try {
+					const nUrl = url.replace(BASE_URL, '')
+					const response = await axi(nUrl);
+
+					if (response.status !== 200) {
+						throw new Error(`HTTP error! Status: ${response.status}`);
+					}
+
+					return response.data; // Assuming response is JSON
+				} catch (error) {
+					console.log(`${url} :`, error.message);
+					throw `Error axios data from ${url}: ${error.message}`;
 				}
 			})
 		);
