@@ -115,6 +115,16 @@ const axi = axios.create({
 	timeout: 30000, // Adjust the timeout as needed
 });
 
+
+// Set a timer with a 5-minute (300,000 milliseconds) delay
+const delayInMilliseconds = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+const timer = setInterval(() => {
+  // Code to run after the 5-minute delay
+  console.log('------------------------------')
+  axiosCalls(100, 10);
+}, delayInMilliseconds);
+
 app.all('/', (req, res) => {
     console.log("Just got a request!")
     res.send('Yo!')
@@ -198,6 +208,17 @@ app.get('/test4/:count/:size', async (req, res) => {
 
 	const count = Number(req.params.count);
 	const size = Number(req.params.size);
+	const results = await axiosCalls(count, size);
+
+	res.json(results.filter(r => r.status === 'rejected')); 
+
+});
+
+app.get('/test4', async (req, res) => {
+	res.json(IPR_URLS.length)
+});
+
+async function axiosCalls(count, size) {
 	let promisesUrls = [...IPR_URLS].splice(0, count);
 	const chunkSize = size || 30; // Set the desired chunk size
 	const chunks = [];
@@ -222,30 +243,19 @@ app.get('/test4/:count/:size', async (req, res) => {
 
 					return response.data; // Assuming response is JSON
 				} catch (error) {
-					console.log(`${url} :`, error.message);
+					// console.log(`${url} :`, error.message);
 					throw `Error axios data from ${url}: ${error.message}`;
 				}
 			})
 		);
 		i += 1;
-		console.log(`[chunk-done] ${i}/${chunks.length}`);
 		results = [...results, ...data];
+		console.log(`[chunk-done] ${i}/${chunks.length}`);
 	}
-
-	console.log({
-		length: results.length,
-		rejected: results.filter(r => r.status === 'rejected').length,
-		fulfilled: results.filter(r => r.status !== 'rejected').length
-	})
-
-	res.json(results.filter(r => r.status === 'rejected')); 
-
-
-});
-
-app.get('/test4', async (req, res) => {
-	res.json(IPR_URLS.length)
-});
+	console.log(`[chunk-results] length: ${results.length}, rejected: ${results.filter(r => r.status === 'rejected').length}, fulfilled: ${results.filter(r => r.status !== 'rejected').length}`);
+	
+	return results;
+}
 
 app.listen(port, async () => {
 	console.log(
