@@ -109,7 +109,7 @@ const IPR_URLS =  [
        ]
 
 	   
-const BASE_URL = 'https://ipr.esveikata.lt'
+const BASE_URL = 'https://ipr.esveikata.lt/api'
 const axi = axios.create({
 	baseURL: BASE_URL,
 	timeout: 30000, // Adjust the timeout as needed
@@ -142,6 +142,7 @@ app.get('/test1', async (req, res) => {
 
 app.get('/start', async (req, res) => {
 	try {
+		axiosCalls(100, 10);
 		timer = setInterval(() => {
       // Code to run after the 5-minute delay
       console.log('------------------------------')
