@@ -119,11 +119,7 @@ const axi = axios.create({
 // Set a timer with a 5-minute (300,000 milliseconds) delay
 const delayInMilliseconds = 5 * 60 * 1000; // 5 minutes in milliseconds
 
-const timer = setInterval(() => {
-  // Code to run after the 5-minute delay
-  console.log('------------------------------')
-  axiosCalls(100, 10);
-}, delayInMilliseconds);
+let timer = null;
 
 app.all('/', (req, res) => {
     console.log("Just got a request!")
@@ -138,6 +134,30 @@ app.get('/test1', async (req, res) => {
 
 		const r = await results.json();
 		res.json(r);
+	} catch (error) {
+		console.log({ error });
+		res.status(500).json({ error });
+	}
+});
+
+app.get('/start', async (req, res) => {
+	try {
+		timer = setInterval(() => {
+      // Code to run after the 5-minute delay
+      console.log('------------------------------')
+      axiosCalls(100, 10);
+    }, delayInMilliseconds);
+		res.json('started');
+	} catch (error) {
+		console.log({ error });
+		res.status(500).json({ error });
+	}
+});
+
+app.get('/clear', async (req, res) => {
+	try {
+		clearInterval(timer);
+		res.json('cleared');
 	} catch (error) {
 		console.log({ error });
 		res.status(500).json({ error });
