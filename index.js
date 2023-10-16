@@ -318,7 +318,7 @@ async function axiosCalls(count, size) {
 				try {
 					const nUrl = url.replace(BASE_URL, '')
 					const response = await axi(nUrl);
-					console.log(`[Headers] :`, {headers: response.headers})
+					console.log(`[Headers] :`, {headers: response.headers['keep-alive']})
 					if (response.status !== 200) {
 						throw new Error(`HTTP error! Status: ${response.status}`);
 					}
