@@ -312,11 +312,11 @@ async function axiosCalls(count, size) {
 				try {
 					const nUrl = url.replace(BASE_URL, '')
 					const response = await axi(nUrl);
-
+					console.log(`[Headers] :`, {headers: response.headers})
 					if (response.status !== 200) {
 						throw new Error(`HTTP error! Status: ${response.status}`);
 					}
-
+					
 					return response.data; // Assuming response is JSON
 				} catch (error) {
 					// console.log(`${url} :`, error.message);
