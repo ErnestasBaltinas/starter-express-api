@@ -203,11 +203,11 @@ app.get('/test1', async (req, res) => {
 
 app.get('/start', async (req, res) => {
 	try {
-		axiosCalls(100, 10);
+		axiosCalls(200, 10);
 		timer = setInterval(() => {
       // Code to run after the 5-minute delay
       console.log('------------------------------')
-      axiosCalls(100, 10);
+      axiosCalls(200, 10);
     }, delayInMilliseconds);
 		res.json('started');
 	} catch (error) {
