@@ -4,6 +4,8 @@ const urls = require('./data.js')
 const app = express()
 const port = process.env.PORT || 3005;
 const axios = require('axios');
+const http = require('http');
+const https = require('https');
 
 const IPR_URLS =  [
     'https://ipr.esveikata.lt/api/searches/appointments/times?municipalityId=7&professionCode=221257&healthcareServiceId=9&organizationId=1000098867',
@@ -168,6 +170,10 @@ const BASE_URL = 'https://ipr.esveikata.lt/api'
 const axi = axios.create({
 	baseURL: BASE_URL,
 	timeout: 30000, // Adjust the timeout as needed
+
+	//keepAlive pools and reuses TCP connections, so it's faster
+	httpAgent: new http.Agent({ keepAlive: true }),
+	httpsAgent: new https.Agent({ keepAlive: true }),
 });
 
 
